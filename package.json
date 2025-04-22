@@ -4,7 +4,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "mastra dev"
+    "dev": "mastra dev",
+    "build": "mastra build",
+    "start": "mastra start",
+    "prettier": "prettier --check '**/*.{ts,tsx,js}'",
+    "prettier:fix": "prettier --write '**/*.{ts,tsx,js}'"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +25,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.14.1",
+    "prettier": "3.5.3",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3"
   }

@@ -1,12 +1,12 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-import { createTool } from "@mastra/core";
+import { createTool } from '@mastra/core';
 
 export const recipeSearchTool = createTool({
-  id: "recipe-search",
-  description: "Search for recipes by name",
+  id: 'recipe-search',
+  description: 'Search for recipes by name',
   inputSchema: z.object({
-    query: z.string().describe("The name of the recipe to search for"),
+    query: z.string().describe('The name of the recipe to search for'),
   }),
   outputSchema: z.object({
     meals: z.array(
@@ -34,17 +34,17 @@ export async function recipeSearchToolFunction(query: string) {
     const data = await response.json();
     return data.meals || [];
   } catch (error) {
-    console.error("Error fetching recipes:", error);
+    console.error('Error fetching recipes:', error);
     return [];
   }
 }
 
 // Search by ingredient
 export const ingredientSearchTool = createTool({
-  id: "ingredient-search",
-  description: "Search for recipes by ingredient",
+  id: 'ingredient-search',
+  description: 'Search for recipes by ingredient',
   inputSchema: z.object({
-    ingredient: z.string().describe("The ingredient to search for"),
+    ingredient: z.string().describe('The ingredient to search for'),
   }),
   outputSchema: z.object({
     meals: z.array(
@@ -72,7 +72,7 @@ export async function ingredientSearchToolFunction(ingredient: string) {
     const data = await response.json();
     return data.meals || [];
   } catch (error) {
-    console.error("Error fetching recipes by ingredient:", error);
+    console.error('Error fetching recipes by ingredient:', error);
     return [];
   }
 }

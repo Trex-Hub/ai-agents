@@ -61,7 +61,7 @@ const forecastSchema = z.array(
     precipitationChance: z.number(),
     condition: z.string(),
     location: z.string(),
-  }),
+  })
 );
 
 const fetchWeather = new Step({

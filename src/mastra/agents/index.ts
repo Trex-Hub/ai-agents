@@ -1,14 +1,14 @@
-import { groq } from "@ai-sdk/groq";
-import { Agent } from "@mastra/core/agent";
-import { weatherTool } from "../tools";
-import { recipeAgentInstructions } from "../instructions/recipe-agent";
-import { ingredientSearchTool } from "../tools/recipe-tools";
-import { Memory } from "@mastra/memory";
+import { groq } from '@ai-sdk/groq';
+import { Agent } from '@mastra/core/agent';
+import { weatherTool } from '../tools';
+import { recipeAgentInstructions } from '../instructions/recipe-agent';
+import { ingredientSearchTool } from '../tools/recipe-tools';
+import { Memory } from '@mastra/memory';
 
 const memory = new Memory();
 
 export const weatherAgent = new Agent({
-  name: "Weather Agent",
+  name: 'Weather Agent',
   instructions: `
       You are a helpful weather assistant that provides accurate weather information.
 
@@ -21,14 +21,14 @@ export const weatherAgent = new Agent({
 
       Use the weatherTool to fetch current weather data.
 `,
-  model: groq("llama-3.3-70b-versatile"),
+  model: groq('llama-3.3-70b-versatile'),
   tools: { weatherTool },
 });
 
 export const recipeAgent = new Agent({
-  name: "Recipe Agent",
+  name: 'Recipe Agent',
   instructions: recipeAgentInstructions,
-  model: groq("llama-3.3-70b-versatile"),
+  model: groq('llama-3.3-70b-versatile'),
   tools: { ingredientSearchTool },
   memory,
 });
