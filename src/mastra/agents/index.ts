@@ -2,7 +2,12 @@ import { groq } from '@ai-sdk/groq';
 import { Agent } from '@mastra/core/agent';
 import { weatherTool } from '../tools';
 import { recipeAgentInstructions } from '../instructions/recipe-agent';
-import { ingredientSearchTool } from '../tools/recipe-tools';
+import {
+  ingredientSearchTool,
+  getMealDetailsTool,
+  listCategoriesTools,
+  filterByCategoryTool,
+} from '../tools/recipe-tools';
 import { Memory } from '@mastra/memory';
 
 const memory = new Memory();
@@ -29,6 +34,11 @@ export const recipeAgent = new Agent({
   name: 'Recipe Agent',
   instructions: recipeAgentInstructions,
   model: groq('llama-3.3-70b-versatile'),
-  tools: { ingredientSearchTool },
+  tools: {
+    ingredientSearchTool,
+    getMealDetailsTool,
+    listCategoriesTools,
+    filterByCategoryTool,
+  },
   memory,
 });
