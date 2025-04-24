@@ -18,7 +18,7 @@
   "dependencies": {
     "@ai-sdk/groq": "^1.2.8",
     "@mastra/core": "^0.8.3",
-    "@mastra/mcp": "^0.3.10",
+    "@mastra/mcp": "^0.4.0",
     "@mastra/memory": "^0.2.10",
     "mastra": "^0.4.9",
     "zod": "^3.24.3"
