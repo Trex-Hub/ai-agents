@@ -20,6 +20,8 @@
     "@mastra/core": "^0.8.3",
     "@mastra/mcp": "^0.4.0",
     "@mastra/memory": "^0.2.10",
+    "dotenv": "^16.5.0",
+    "googleapis": "^148.0.0",
     "mastra": "^0.4.9",
     "zod": "^3.24.3"
   },

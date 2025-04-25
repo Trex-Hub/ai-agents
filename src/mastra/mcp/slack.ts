@@ -1,4 +1,11 @@
+// MCP
 import { MCPConfiguration } from '@mastra/mcp';
+// CONSTANTS
+import { 
+  SLACK_BOT_TOKEN, 
+  SLACK_TEAM_ID, 
+  SLACK_CHANNEL_IDS
+} from '../../utils/constants';
 
 export const mcp = new MCPConfiguration({
   servers: {
@@ -6,9 +13,9 @@ export const mcp = new MCPConfiguration({
       command: 'npx',
       args: ['-y', '@modelcontextprotocol/server-slack'],
       env: {
-        SLACK_BOT_TOKEN: process.env.SLACK_BOT_TOKEN ?? '',
-        SLACK_TEAM_ID: process.env.SLACK_TEAM_ID ?? '',
-        SLACK_CHANNEL_IDS: process.env.SLACK_CHANNEL_IDS ?? '',
+        SLACK_BOT_TOKEN,
+        SLACK_TEAM_ID,
+        SLACK_CHANNEL_IDS,
       },
     },
   },
