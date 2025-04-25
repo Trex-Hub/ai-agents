@@ -1,3 +1,4 @@
+import { groq } from '@ai-sdk/groq';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -10,3 +11,9 @@ export const GOOGLE_CALENDAR_API_URL = process.env.GOOGLE_CALENDAR_API_URL;
 export const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN ?? '';
 export const SLACK_TEAM_ID = process.env.SLACK_TEAM_ID ?? '';
 export const SLACK_CHANNEL_IDS = process.env.SLACK_CHANNEL_IDS ?? '';
+
+export const model = groq('llama-3.3-70b-versatile');
+
+
+
+

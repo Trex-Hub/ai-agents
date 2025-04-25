@@ -1,6 +1,6 @@
 import { Agent } from '@mastra/core/agent';
 import { mcp } from '../mcp/slack';
-import { model } from '../../utils/constant';
+import { model } from '../../utils/constants';
 import { slackAgentInstructions } from '../instructions/slack-agent';
 
 export const slackAgent = new Agent({
