@@ -1,102 +1,68 @@
-// SERVICES
-import { ApiService } from '../services';
+// GOOGLE MEET APIs
+import { google } from 'googleapis';
 // LOGGER
 import logger from '../utils/logger';
 // CONSTANTS
-import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN, GOOGLE_OAUTH_TOKEN_URL, GOOGLE_CALENDAR_API_URL } from '../utils/constants';
-
-const googleCalendarApi = new ApiService(GOOGLE_CALENDAR_API_URL);
+import {
+     GOOGLE_CLIENT_ID, 
+     GOOGLE_CLIENT_SECRET, 
+     GOOGLE_REFRESH_TOKEN,
+} from '../utils/constants';
 
 /**
- * Fetches a fresh access token using OAuth2 refresh token.
+ * Retrieves the participant session details for a specific meeting.
+ *
+ * @param {any} c - The context object containing the request.
+ * @returns {Promise<Array<{ participantId: string; joinTime: string; leaveTime: string }> | null>} A promise that resolves with an array of participant session details, or null if an error occurs.
+ * @throws {Error} If there's an issue with authentication or API request.
  */
-const fetchAccessToken = async (): Promise<string> => {
+export const getMeetParticipants = async (c: any) => {
+  const meetingId = c.req.query('meetingId');
+  logger.info(`Getting participant sessions for meeting ${meetingId}`);
   try {
-    const response = await fetch(GOOGLE_OAUTH_TOKEN_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        client_id: GOOGLE_CLIENT_ID,
-        client_secret: GOOGLE_CLIENT_SECRET,
-        refresh_token: GOOGLE_REFRESH_TOKEN,
-        grant_type: 'refresh_token',
-      }),
+    const oauth2Client = new google.auth.OAuth2(
+        GOOGLE_CLIENT_ID,
+        GOOGLE_CLIENT_SECRET
+    );
+
+    oauth2Client.setCredentials({
+        refresh_token: GOOGLE_REFRESH_TOKEN
     });
 
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Failed to refresh token: ${errText}`);
-    }
+    const meet = google.meet({ version: 'v2', auth: oauth2Client });
 
-    const { access_token } = await response.json();
-    return access_token;
-  } catch (err) {
-    logger.error('❌ Error fetching access token:', err);
-    throw err;
-  }
-};
+    // 1. List participants to get their IDs
+    const participantsResponse = await meet.conferenceRecords.participants.list({
+      parent: `conferenceRecords/${meetingId}`,
+    });
 
-/**
- * Retrieves invited attendees and meeting details for a Google Meet.
- */
-export const getMeetParticipants = async (
-  meetingId: string
-): Promise<{
-  title: string;
-  organizer: string;
-  startTime: string;
-  endTime: string;
-  invitedAttendees: Array<{ email: string; name: string; status: string; optional: boolean }>;
-  currentParticipantsNote: string;
-} | null> => {
-  try {
-    if (!meetingId.trim()) {
-      throw new Error('Meeting ID is required');
-    }
+    const participants = participantsResponse?.data?.participants || [];
 
-    const accessToken = await fetchAccessToken();
+    const participantSessions = [];
 
-    const { data, isError, error } = await googleCalendarApi.get<any>(
-      `/events?q=${encodeURIComponent(meetingId)}&singleEvents=true`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
+    // 2. For each participant, list their sessions
+    for (const participant of participants) {
+      const participantId = participant.name?.split('/').pop();
+      if (!participantId) continue;
+
+      const sessionsResponse = await meet.conferenceRecords.participants.participantSessions.list({
+        parent: `conferenceRecords/${meetingId}/participants/${participantId}`,
+      });
+
+      const sessions = sessionsResponse?.data?.participantSessions || [];
+
+      for (const session of sessions) {
+        participantSessions.push({
+          participantId,
+          joinTime: session.startTime,
+          leaveTime: session.endTime,
+        });
       }
-    );
-
-    if (isError || !data) {
-      throw error || new Error('Error retrieving meeting data');
     }
 
-    const meetEvent = data.items?.find((evt: any) =>
-      evt.conferenceData?.conferenceId === meetingId ||
-      (evt.hangoutLink && evt.hangoutLink.includes(meetingId))
-    );
-
-    if (!meetEvent) {
-      throw new Error(`No meeting found with ID: ${meetingId}`);
-    }
-
-    const attendees = meetEvent.attendees || [];
-
-    return {
-      title: meetEvent.summary || 'Untitled Meeting',
-      organizer: meetEvent.organizer?.email || 'Unknown',
-      startTime: meetEvent.start?.dateTime || meetEvent.start?.date || 'Unknown',
-      endTime: meetEvent.end?.dateTime || meetEvent.end?.date || 'Unknown',
-      invitedAttendees: attendees.map((a: any) => ({
-        email: a.email,
-        name: a.displayName || a.email,
-        status: a.responseStatus || 'unknown',
-        optional: a.optional || false,
-      })),
-      currentParticipantsNote:
-        'Google does not provide a public API to retrieve real-time participant information.',
-    };
-  } catch (err) {
-    logger.error('❌ Error in getMeetParticipants:', err);
-    return null;
+    return participantSessions;
+  } catch (error) {
+    logger.error('Error getting participant sessions:', error);
+    throw error;
   }
 };
